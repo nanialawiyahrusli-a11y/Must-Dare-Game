@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎲 30 Squares · Must & Dare · Classroom Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Poppins', 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #1e3c72 0%, #2a5298 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .game-wrapper {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 60px 60px 40px 40px;
+            padding: 2rem 2rem 2.5rem;
+            box-shadow: 0 30px 40px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 230, 100, 0.6);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.8rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        h1 {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: #ffeb99;
+            text-shadow: 5px 5px 0 #1e2b4f, 2px 2px 0 #ffbb33;
+            letter-spacing: 2px;
+            word-break: break-word;
+        }
+
+        h1 span {
+            background: #f9c74f;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            color: #1e2b4f;
+            font-size: 1.9rem;
+            margin-left: 10px;
+            text-shadow: none;
+            box-shadow: inset 0 -4px 0 #b87c1b;
+        }
+
+        .score-panel {
+            background: #fff2d4;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #1e3c72;
+            border: 4px solid #f9c74f;
+            box-shadow: 0 8px 0 #b87c1b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .score-panel span {
+            background: #1e3c72;
+            color: #ffd966;
+            padding: 0.2rem 1.2rem;
+            border-radius: 40px;
+            font-size: 2rem;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 14px;
+            margin: 1rem 0 1.8rem;
+        }
+
+        .square {
+            aspect-ratio: 1 / 1;
+            background: #ffe9b6;
+            background-image: radial-gradient(circle at 20% 30%, #fff9e6, #fcd97e);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1e2b4f;
+            box-shadow: 0 10px 0 #b87c1b, 0 8px 12px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.08s ease;
+            border: 3px solid #f9c74f;
+            padding: 0.2rem;
+            text-align: center;
+            line-height: 1.2;
+            position: relative;
+            user-select: none;
+        }
+
+        .square:active {
+            transform: translateY(5px);
+            box-shadow: 0 5px 0 #b87c1b, 0 8px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .square.answered {
+            background: #b0c4de;
+            background: linear-gradient(145deg, #8fa8c8, #6d89b0);
+            box-shadow: 0 5px 0 #3e5a7a, 0 8px 12px rgba(0, 0, 0, 0.2);
+            border-color: #4d6b8f;
+            color: #eef4ff;
+            cursor: default;
+            transform: translateY(5px);
+            pointer-events: none;
+            opacity: 0.8;
+            font-size: 1.3rem;
+        }
+
+        .square.answered::after {
+            content: "✓✓";
+            font-size: 1.5rem;
+            letter-spacing: -4px;
+            color: #d4ed4a;
+            text-shadow: 0 0 5px #2e4d2e;
+        }
+
+        .square.dare {
+            background: #fbc4d0;
+            background: radial-gradient(circle at 30% 20%, #ffe0e8, #f9a8b8);
+            border-color: #ff6f91;
+            box-shadow: 0 10px 0 #b3415a, 0 8px 12px rgba(0, 0, 0, 0.3);
+            color: #5a1e2b;
+        }
+
+        .square.dare.answered {
+            background: #b0c4de;
+            background: linear-gradient(145deg, #8fa8c8, #6d89b0);
+            box-shadow: 0 5px 0 #3e5a7a;
+            border-color: #4d6b8f;
+        }
+
+        .square.dare.answered::after {
+            content: "💃✓";
+        }
+
+        .square .badge {
+            font-size: 0.8rem;
+            background: #ffffffb3;
+            border-radius: 30px;
+            padding: 2px 8px;
+            margin-top: 2px;
+            font-weight: 600;
+            color: #333;
+            display: inline-block;
+            border: 1px solid #999;
+        }
+
+        .square.dare .badge {
+            background: #ffd966dd;
+            color: #5a1e2b;
+        }
+
+        .info-message {
+            background: #fff9e0;
+            border-radius: 40px;
+            padding: 1.2rem 2rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e3c72;
+            text-align: center;
+            border: 3px dashed #f9c74f;
+            box-shadow: 0 6px 0 #b87c1b;
+            margin-bottom: 1.5rem;
+            min-height: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-break: break-word;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #f9c74f;
+            border: none;
+            padding: 1rem 2.8rem;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #1e2b4f;
+            box-shadow: 0 9px 0 #b87c1b, 0 6px 12px black;
+            cursor: pointer;
+            transition: all 0.08s;
+            letter-spacing: 1px;
+            border: 2px solid #ffe28a;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 4px 0 #b87c1b, 0 6px 12px black;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            transform: translateY(5px);
+            box-shadow: 0 4px 0 #7a5e2b;
+            pointer-events: none;
+        }
+
+        .btn.reset {
+            background: #cbd5e1;
+            box-shadow: 0 9px 0 #5f6b7a, 0 6px 12px black;
+            border-color: #e2e8f0;
+        }
+
+        .footer {
+            margin-top: 1.5rem;
+            font-size: 1rem;
+            color: #ffeb99;
+            font-weight: 600;
+            text-shadow: 2px 2px 0 #1e2b4f;
+        }
+
+        @media (max-width: 700px) {
+            .game-wrapper {
+                padding: 1rem;
+                border-radius: 40px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            h1 span {
+                font-size: 1.2rem;
+            }
+            .board {
+                gap: 8px;
+            }
+            .square {
+                font-size: 1.2rem;
+                border-radius: 14px;
+            }
+            .square.answered {
+                font-size: 1rem;
+            }
+            .info-message {
+                font-size: 1rem;
+                padding: 1rem;
+                min-height: 80px;
+            }
+            .btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-wrapper">
+        <header>
+            <h1>🎲 MUST & DARE <span>30</span></h1>
+            <div class="score-panel">
+                🏆 Dares done: <span id="dareCount">0</span>
+            </div>
+        </header>
+
+        <div id="board" class="board"></div>
+
+        <div id="messageBox" class="info-message">
+            👋 Click a square to begin! (25 questions + 5 dares)
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="resetBtn">🔄 Reset Game</button>
+        </div>
+        <div class="footer">⭐ 25 "You must..." questions & 5 fun dares ⭐</div>
+    </div>
+
+    <script>
+        (function(){
+            // ---------- 25 QUESTIONS (MUST) ----------
+            const questions = [
+                "What do you say when your friend is noisy in the library?",
+                "What do you say when your friend comes late to school?",
+                "What do you say when your friend leaves food on the plate?",
+                "What do you say when your friend doesn't do the homework?",
+                "What do you say when your friend talks during the lesson?",
+                "What do you say when your friend throws trash on the floor?",
+                "What do you say when your friend is late to the class?",
+                "What do you say when your friend doesn't listen to the teacher?",
+                "What do you say when your friend wastes his food?",
+                "What do you say when your friend forgets to do his homework?",
+                "What do you say when your friend makes noise in the classroom?",
+                "What do you say when your friend comes to school late again?",
+                "What do you say when your friend doesn't finish his lunch?",
+                "What do you say when your friend doesn't bring his homework book?",
+                "What do you say when your friend doesn't listen when the teacher explains?",
+                "What do you say when your friend leaves the trash in the classroom?",
+                "What do you say when your friend is very loud in the class?",
+                "What do you say when your friend arrives after the bell rings?",
+                "What do you say when your friend refuses to eat his vegetables?",
+                "What do you say when your friend copies homework from you?",
+                "What do you say when your friend talks to his friend while the teacher is talking?",
+                "What do you say when your friend doesn't want to take out the trash?",
+                "What do you say when your friend is late and misses the morning flag ceremony?",
+                "What do you say when your friend doesn't do his homework and plays games instead?",
+                "What do you say when your friend is noisy and doesn't listen to the teacher?"
+            ];
+
+            // ---------- 5 DARES (funny / dance) ----------
+            const dares = [
+                "💃 DARE: Dance like a robot for 10 seconds!",
+                "🕺 DARE: Do the chicken dance!",
+                "⭐ DARE: Sing 'Twinkle Twinkle Little Star' with a funny voice!",
+                "🐒 DARE: Hop like a frog 5 times and say 'You must listen to your teacher!'",
+                "🎤 DARE: Make your best animal sound (meow, woof, moo) and tell your friend: 'You must be quiet!'"
+            ];
+
+            // Combine into 30 squares: 25 questions + 5 dares
+            // We will shuffle them to mix dares among questions.
+            function buildSquareData() {
+                // Create an array of 30 items: each item is { type: 'question' | 'dare', text: string }
+                const items = [];
+                questions.forEach(q => items.push({ type: 'question', text: q }));
+                dares.forEach(d => items.push({ type: 'dare', text: d }));
+                
+                // Fisher–Yates shuffle
+                for (let i = items.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [items[i], items[j]] = [items[j], items[i]];
+                }
+                return items;
+            }
+
+            // State
+            let squareData = buildSquareData();        // 30 objects
+            let answered = new Array(30).fill(false);
+            let dareCounter = 0;                       // how many dares answered
+            
+            // DOM elements
+            const boardEl = document.getElementById('board');
+            const messageBox = document.getElementById('messageBox');
+            const dareCountSpan = document.getElementById('dareCount');
+            const resetBtn = document.getElementById('resetBtn');
+
+            // Render the 30 squares
+            function renderBoard() {
+                boardEl.innerHTML = '';
+                squareData.forEach((item, index) => {
+                    const square = document.createElement('div');
+                    square.className = 'square';
+                    if (item.type === 'dare') {
+                        square.classList.add('dare');
+                    }
+                    if (answered[index]) {
+                        square.classList.add('answered');
+                    }
+
+                    // number label
+                    const num = document.createElement('div');
+                    num.textContent = index + 1;
+                    num.style.fontSize = '0.9rem';
+                    num.style.opacity = '0.7';
+                    num.style.fontWeight = '600';
+                    square.appendChild(num);
+
+                    // optional small badge for type
+                    const badge = document.createElement('span');
+                    badge.className = 'badge';
+                    if (item.type === 'dare') {
+                        badge.textContent = '🎭 DARE';
+                    } else {
+                        badge.textContent = '❓ MUST';
+                    }
+                    square.appendChild(badge);
+
+                    // if already answered, show checkmark via class (already styled)
+                    // but we also want to show type hint: answered already shows ✓✓ via CSS, but keep clean.
+
+                    // Click handler
+                    square.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (answered[index]) return; // already answered
+                        handleSquareClick(index, square);
+                    });
+
+                    boardEl.appendChild(square);
+                });
+            }
+
+            // Handle click on a square
+            function handleSquareClick(index, squareEl) {
+                const item = squareData[index];
+                if (answered[index]) return;
+
+                // Mark as answered
+                answered[index] = true;
+                squareEl.classList.add('answered');
+
+                // Update message
+                if (item.type === 'question') {
+                    messageBox.innerHTML = `❓ <strong>Question ${index+1}:</strong> ${item.text} <br><span style="font-size:1rem; color:#3b5a7a;">(Answer with: You must ...)</span>`;
+                } else {
+                    // It's a dare
+                    messageBox.innerHTML = `🎭 <strong>DARE ${index+1}:</strong> ${item.text.replace('DARE:','')} <br><span style="font-size:1rem; color:#a1354b;">(Go on, do it! 😄)</span>`;
+                    // Increment dare counter
+                    dareCounter++;
+                    dareCountSpan.textContent = dareCounter;
+                }
+
+                // Optional: check if all dares are done
+                if (dareCounter === dares.length) {
+                    messageBox.innerHTML += `<br>🎉 <strong>All dares completed! You're a superstar!</strong> 🎉`;
+                }
+
+                // If all squares answered, show a final message
+                if (answered.every(v => v === true)) {
+                    messageBox.innerHTML += `<br>🏁 <strong>WOW! You finished all 30 squares! Great job! 🏁</strong>`;
+                }
+            }
+
+            // Reset the whole game
+            function resetGame() {
+                // Re-shuffle? yes, for a fresh experience
+                squareData = buildSquareData();
+                answered = new Array(30).fill(false);
+                dareCounter = 0;
+                dareCountSpan.textContent = '0';
+                messageBox.innerHTML = '👋 Click a square to begin! (25 questions + 5 dares)';
+                renderBoard();
+            }
+
+            // initial render
+            renderBoard();
+
+            // reset button event
+            resetBtn.addEventListener('click', resetGame);
+        })();
+    </script>
+</body>
+</html>
